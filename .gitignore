@@ -1,0 +1,7 @@
+.pio/
+.vscode/
+build/
+*.exe
+events.csv
+# your recorded evaluation clips (keep them out of git unless you want to share them)
+data/

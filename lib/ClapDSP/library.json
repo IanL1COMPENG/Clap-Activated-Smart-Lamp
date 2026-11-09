@@ -1,0 +1,7 @@
+{
+  "name": "ClapDSP",
+  "version": "1.0.0",
+  "description": "Clap detection for an 8 kHz microphone stream: IIR high-pass, onset detection, feature extraction (rise time, duration, crest factor, FFT spectrum), classifier and clap-pattern state machine.",
+  "frameworks": "*",
+  "platforms": "*"
+}

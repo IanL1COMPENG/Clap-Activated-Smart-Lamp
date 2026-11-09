@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: pio-${{ runner.os }}-${{ hashFiles('platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      - name: Unit tests (ClapDSP on host)
+        run: pio test -e native -v
+
+      - name: Build ESP32 firmware
+        run: pio run -e esp32dev
+
+      - name: Build evaluation tool
+        run: g++ -std=c++17 -O2 -Wall -I lib/ClapDSP/src tools/clap_eval.cpp -o clap_eval
+
+      - name: Evaluate on synthetic clips
+        run: ./clap_eval --synthetic | tee eval.txt
+
+      - name: Firmware size
+        run: pio run -e esp32dev -t size
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware-and-eval
+          path: |
+            .pio/build/esp32dev/firmware.bin
+            eval.txt
